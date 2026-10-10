@@ -1,0 +1,19 @@
+{
+  "zones": [
+    "Library",
+    "LHC",
+    "Lab 2",
+    "Mess",
+    "Hostel",
+    "Sports ground"
+  ],
+  "adjacency": {
+    "Library": ["LHC", "Lab 2"],
+    "LHC": ["Library", "Lab 2", "Mess"],
+    "Lab 2": ["Library", "LHC"],
+    "Mess": ["LHC", "Hostel", "Sports ground"],
+    "Hostel": ["Mess", "Sports ground"],
+    "Sports ground": ["Mess", "Hostel"]
+  },
+  "staffed_handover_default": "Staffed Security Desk (Main Gate / DOSA Office) — Bring Institute ID"
+}
