@@ -13,7 +13,19 @@ from typing import Any, Dict, List, Optional
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_DB_PATH = PROJECT_ROOT / "campus_lost_plus.db"
+IS_VERCEL = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+DEFAULT_DB_PATH = (
+    Path("/tmp/campus_lost_plus.db")
+    if IS_VERCEL
+    else (PROJECT_ROOT / "campus_lost_plus.db")
+)
+
+
+def get_uploads_dir() -> Path:
+    """Resolve writable uploads directory (/tmp/uploads on Vercel, ./uploads locally)."""
+    target = Path("/tmp/uploads") if IS_VERCEL else (PROJECT_ROOT / "uploads")
+    target.mkdir(parents=True, exist_ok=True)
+    return target
 
 
 def get_db_path() -> Path:
@@ -21,7 +33,9 @@ def get_db_path() -> Path:
     env_path = os.getenv("DATABASE_PATH", "").strip()
     if env_path:
         p = Path(env_path)
-        return p if p.is_absolute() else (PROJECT_ROOT / p)
+        if p.is_absolute():
+            return p
+        return (Path("/tmp") / p) if IS_VERCEL else (PROJECT_ROOT / p)
     return DEFAULT_DB_PATH
 
 

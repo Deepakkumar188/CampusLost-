@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 from PIL import Image, ImageDraw
 
-from backend.db import get_connection, init_db, insert_report
+from backend.db import get_connection, get_uploads_dir, init_db, insert_report
 from backend.privacy import (
     enforce_staffed_handover,
     is_sensitive_item,
@@ -23,7 +23,7 @@ from backend.privacy import (
 from backend.scoring import load_zones_config
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-UPLOADS_DIR = PROJECT_ROOT / "uploads"
+UPLOADS_DIR = get_uploads_dir()
 
 
 def _make_demo_image(rgb: tuple[int, int, int], accent: tuple[int, int, int], label: str) -> bytes:

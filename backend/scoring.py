@@ -25,9 +25,11 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from PIL import Image
 
 
+from backend.db import get_uploads_dir
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ZONES_CONFIG_PATH = PROJECT_ROOT / "config" / "zones.json"
-UPLOADS_DIR = PROJECT_ROOT / "uploads"
+UPLOADS_DIR = get_uploads_dir()
 
 BASE_WEIGHTS: Dict[str, float] = {
     "attributes": 30.0,

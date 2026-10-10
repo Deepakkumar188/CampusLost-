@@ -17,9 +17,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from backend.db import (
+    IS_VERCEL,
     get_claim_by_id,
     get_or_create_claim,
     get_report_by_id,
+    get_uploads_dir,
     init_db,
     insert_report,
     list_reports,
@@ -50,8 +52,7 @@ from backend.scoring import load_zones_config, rank_matches_for_report
 load_dotenv()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-UPLOADS_DIR = PROJECT_ROOT / "uploads"
-UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+UPLOADS_DIR = get_uploads_dir()
 
 MAX_CLAIM_ATTEMPTS = 3
 HANDOVER_STAGES = ["Matched", "Verified", "Handover scheduled", "Done"]
@@ -59,11 +60,22 @@ HANDOVER_STAGES = ["Matched", "Verified", "Handover scheduled", "Done"]
 from contextlib import asynccontextmanager
 
 
+def _ensure_ready() -> None:
+    """Ensure SQLite tables exist; on Vercel cold starts, auto-seed the 12 demo reports if empty."""
+    init_db()
+    if IS_VERCEL and not list_reports():
+        from seed import seed_database
+
+        seed_database()
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    init_db()
+    _ensure_ready()
     yield
 
+
+_ensure_ready()
 
 app = FastAPI(
     title="CampusLost+ API",
